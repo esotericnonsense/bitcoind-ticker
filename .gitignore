@@ -1,0 +1,11 @@
+*.pyc
+# ignore configuration files
+*.conf
+# ignore profiling
+*.lprof
+# ignore log files
+*.log
+# ignore vim temporary files
+*.swp
+# ignore dependencies
+bitcoinrpc/*
