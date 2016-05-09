@@ -9,6 +9,7 @@ import zmq.green as zmq
 import binascii
 import datetime
 
+import config
 import bitcoinrpc.authproxy
 
 def zmqpoller(hash_queue):
@@ -18,12 +19,14 @@ def zmqpoller(hash_queue):
         body = msg[1]
         hash_queue.put(binascii.hexlify(body))
 
-def rpcrequester(hash_queue):
-    with open("bitcoin.conf", "r") as f:
-        rpcuser = f.readline().strip("\n")
-        rpcpassword = f.readline().strip("\n")
-
-    rpcurl = "http://{}:{}@127.0.0.1:8332".format(rpcuser, rpcpassword)
+def rpcrequester(hash_queue, cfg):
+    rpcurl = "{}://{}:{}@{}:{}".format(
+        cfg["protocol"],
+        cfg["rpcuser"],
+        cfg["rpcpassword"],
+        cfg["rpcip"],
+        cfg["rpcport"],
+    )
     handle = bitcoinrpc.authproxy.AuthServiceProxy(rpcurl, None, 500)
 
     # Check that it's working...
@@ -41,7 +44,28 @@ def rpcrequester(hash_queue):
 
         print
 
+def process_config(cfg):
+    assert "rpcuser" in cfg
+    assert "rpcpassword" in cfg
+
+    if "rpcip" not in cfg:
+        cfg["rpcip"] = "localhost"
+
+    if "rpcport" not in cfg:
+        if "testnet" in cfg:
+            cfg["rpcport"] = 18332
+        else:
+            cfg["rpcport"] = 8332
+
+    if "protocol" not in cfg:
+        cfg["protocol"] = "http"
+
+    return cfg
+
 if __name__ == "__main__":
+    cfg = config.read_file("bitcoin.conf")
+    cfg = process_config(cfg)
+
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
     socket.setsockopt(zmq.SUBSCRIBE, "hashtx")
@@ -51,7 +75,7 @@ if __name__ == "__main__":
     zmq_process = gevent.spawn(zmqpoller, hash_queue)
 
     try:
-        rpcrequester(hash_queue)
+        rpcrequester(hash_queue, cfg)
     finally:
         socket.close()
         context.term()
