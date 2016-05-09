@@ -7,6 +7,7 @@ import gevent.queue
 import zmq.green as zmq
 
 import binascii
+import datetime
 
 import bitcoinrpc.authproxy
 
@@ -33,7 +34,7 @@ def rpcrequester(hash_queue):
         try:
             outs = [(vout["scriptPubKey"]["addresses"][0], vout["value"]) for vout in tx["vout"]] 
             for out in outs:
-                print "{}: {}BTC".format(out[0], out[1])
+                print "{} {} received {}BTC".format(datetime.datetime.utcnow().isoformat(), out[0], out[1])
         except KeyError:
             print "odd tx"
             print tx
