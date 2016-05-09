@@ -25,6 +25,8 @@ Success.
 
 * Developed with python 2.7.11, Bitcoin Core 0.12.1
 * jgarzik's python-bitcoinrpc library (https://github.com/jgarzik/python-bitcoinrpc)
+* python2-pyzmq, ZeroMQ 4.1.4
+* python2-gevent 1.1.1
 
 ## Installation
 
