@@ -11,9 +11,9 @@ $ mv python-bitcoinrpc/bitcoinrpc bitcoind-ticker/
 ```
 
 ## Usage
-
 ```
-$ cd ~/bitcoind-ticker
+$ cp ~/.bitcoin/bitcoin.conf bitcoind-ticker/
+$ cd bitcoind-ticker
 $ ./bitcoind -zmqpubhashtx=tcp://127.0.0.1:10000
 $ main.py
 ```
