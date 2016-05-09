@@ -27,10 +27,14 @@ def rpcrequester(hash_queue, cfg):
         cfg["rpcip"],
         cfg["rpcport"],
     )
+    print "Connecting to bitcoind RPC..."
     handle = bitcoinrpc.authproxy.AuthServiceProxy(rpcurl, None, 500)
+    print "Connected. Requesting 'getinfo'..."
 
     # Check that it's working...
     getinfo = handle.getinfo()
+    print "Success."
+    print
 
     for txhash in hash_queue:
         tx = handle.getrawtransaction(txhash, 1)
