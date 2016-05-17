@@ -4,6 +4,8 @@ monkey.patch_all()
 import gevent
 import gevent.queue
 
+import sys
+
 import zmq.green as zmq
 
 import binascii
@@ -36,17 +38,25 @@ def rpcrequester(hash_queue, cfg):
     print "Success."
     print
 
+    total = 0
+    start_time = datetime.datetime.utcnow()
+
     for txhash in hash_queue:
+        sys.stdout.write("\r")
         tx = handle.getrawtransaction(txhash, 1)
         try:
             outs = [(vout["scriptPubKey"]["addresses"][0], vout["value"]) for vout in tx["vout"]] 
             for out in outs:
                 print "{} {} received {}BTC".format(datetime.datetime.utcnow().isoformat(), out[0], out[1])
+                total += out[1]
         except KeyError:
             print "odd tx"
             print tx
 
+        total_time = datetime.datetime.utcnow() - start_time
         print
+        sys.stdout.write("Total transferred: {}BTC in {}s".format(total, total_time.total_seconds()))
+        sys.stdout.flush()
 
 def process_config(cfg):
     assert "rpcuser" in cfg
