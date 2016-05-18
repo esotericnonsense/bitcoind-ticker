@@ -14,6 +14,11 @@ import datetime
 import config
 import bitcoinrpc.authproxy
 
+class termcolors:
+    yellow = '\033[33m'
+    cyan = '\033[36m'
+    reset = '\033[0m'
+
 def zmqpoller(hash_queue):
     while True:
         msg = socket.recv_multipart()
@@ -47,7 +52,11 @@ def rpcrequester(hash_queue, cfg):
         try:
             outs = [(vout["scriptPubKey"]["addresses"][0], vout["value"]) for vout in tx["vout"]] 
             for out in outs:
-                print "{} {} received {}BTC".format(datetime.datetime.utcnow().isoformat(), out[0], out[1])
+                print "{}{}{} {} received {}{}BTC{}".format(
+                    termcolors.yellow, datetime.datetime.utcnow().isoformat(), termcolors.reset,
+                    out[0],
+                    termcolors.cyan, out[1], termcolors.reset
+                )
                 total += out[1]
         except KeyError:
             print "odd tx"
@@ -55,7 +64,9 @@ def rpcrequester(hash_queue, cfg):
 
         total_time = datetime.datetime.utcnow() - start_time
         print
-        sys.stdout.write("Total transferred: {}BTC in {}s".format(total, total_time.total_seconds()))
+        sys.stdout.write("Total transferred: {}{}BTC{} in {}s".format(
+            termcolors.cyan, total, termcolors.reset,
+            total_time.total_seconds()))
         sys.stdout.flush()
 
 def process_config(cfg):
