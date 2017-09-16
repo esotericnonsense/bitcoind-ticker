@@ -2,6 +2,8 @@
 
 A very basic demo of the zmqpubhashtx functionality in bitcoind.
 
+## NOTE - this repository is no longer maintained.
+
 ## Example output
 
 ```
